@@ -1,8 +1,8 @@
 # Sheila Gracia Angelina — Portfolio
 
 A single-page portfolio for a Senior System Analyst, built with Next.js 16 (App Router),
-TypeScript, and Tailwind CSS v4. The contact form sends through EmailJS from the server and is
-rate-limited by client IP.
+TypeScript, and Tailwind CSS v4, exported as a static site. The contact form sends through
+EmailJS's browser SDK directly from the client.
 
 ## Getting started
 
@@ -15,8 +15,8 @@ npm run dev                  # http://localhost:3000
 | Script | What it does |
 | --- | --- |
 | `npm run dev` | Development server |
-| `npm run build` | Production build |
-| `npm start` | Serve the production build |
+| `npm run build` | Static export to `out/` |
+| `npm start` | Serve the exported `out/` directory locally |
 | `npm run lint` | ESLint |
 | `npm test` | Unit tests (`node --test`) |
 
@@ -58,43 +58,27 @@ backdrop without hand-rolling any of it.
 
 ## Contact form
 
-The browser posts `{ name, email, message }` to `POST /api/contact`. The route
-(`src/app/api/contact/route.ts`) then:
+`Contact.tsx` calls `sendContactEmail()` (`src/lib/emailjs.ts`), which wraps EmailJS's browser
+SDK, directly from the client:
 
-1. validates with zod (name 2–80, valid email ≤120, message 10–2000);
-2. silently discards anything that filled the hidden `company` honeypot;
-3. checks the caller's IP against the rate limit;
-4. sends through the EmailJS REST API server-side;
-5. counts the send against the limit **only after it succeeded**, so a provider outage never
-   burns a visitor's allowance.
+1. the hidden `company` honeypot is checked client-side — a filled value is silently accepted
+   and discarded, never sent;
+2. otherwise the message goes straight to EmailJS via `emailjs.send()`.
 
-The EmailJS browser SDK is deliberately not used: the limit has to be enforced where the real
-client IP is visible, and the private key must never reach the browser.
+There is no server, so there is no server-enforced rate limit and no private key — the site is a
+static export (`output: "export"` in `next.config.ts`) with nothing to hold either.
 
 ### EmailJS setup
 
 1. Create an Email Service and an Email Template at <https://dashboard.emailjs.com>. The template
    must use the variables `{{from_name}}`, `{{from_email}}`, and `{{message}}`.
-2. Copy the four values into `.env.local` (see `.env.example` for exactly where each one lives).
-3. **Account → Security → enable "Allow EmailJS API for non-browser applications".** EmailJS
-   blocks server-side calls by default; without this every send returns 403.
+2. Copy the three values into `.env.local` (see `.env.example` for exactly where each one lives).
+   They carry the `NEXT_PUBLIC_` prefix on purpose — they ship to the browser, and there is no
+   private key to keep secret.
+3. Optional but recommended: under **Account → Security**, restrict allowed origins to your
+   deployed domain(s) so the public key can't be replayed from elsewhere.
 
-On Vercel, add the same four variables under Project Settings → Environment Variables. They have
-no `NEXT_PUBLIC_` prefix, so they stay server-only.
-
-### Rate limiting
-
-`src/lib/rate-limit.ts` keeps a sliding window of **3 sends per IP per 10 minutes**, backed by
-process memory.
-
-> **Caveat.** On serverless hosting each instance holds its own counter and the map is cleared on
-> cold start, so the real guarantee is "3 per 10 minutes per running instance". That stops casual
-> abuse of the form; it is not a hard security boundary. For strict enforcement, swap the `Map`
-> for a shared store such as `@upstash/ratelimit` — `check()` and `record()` are the only
-> functions the route uses, so no other file changes.
-
-`EMAILJS_ENDPOINT` overrides the API URL. Leave it unset outside local testing; it exists so the
-route can be exercised end-to-end against a stub without sending real mail.
+On Vercel, add the same three variables under Project Settings → Environment Variables.
 
 ## Layout notes
 
@@ -114,5 +98,6 @@ route can be exercised end-to-end against a stub without sending real mail.
 
 ## Deploying
 
-Push to GitHub and import the repository at [vercel.com/new](https://vercel.com/new). Add the four
-`EMAILJS_*` variables, then deploy — no other configuration is needed.
+Push to GitHub and import the repository at [vercel.com/new](https://vercel.com/new). Add the
+three `NEXT_PUBLIC_EMAILJS_*` variables, then deploy. The build is a static export (`out/`), so
+it also works on any static host — Netlify, GitHub Pages, S3, etc.

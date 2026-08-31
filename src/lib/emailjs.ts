@@ -1,19 +1,13 @@
 /**
- * Server-side EmailJS transport.
+ * Client-side EmailJS transport.
  *
- * The browser SDK is deliberately not used: the rate limit has to be enforced
- * where the real client IP is visible, and the private key must never ship to
- * the client. EmailJS blocks non-browser calls by default — switch on
- * "Allow API calls from non-browser applications" under Account → Security,
- * otherwise every request comes back 403.
+ * The site is a static export with no server to hold a private key or see the
+ * caller's real IP, so this uses EmailJS's browser SDK with the public key
+ * only. Abuse defense is whatever EmailJS's own dashboard limits and
+ * domain-restriction offer — see README for setup.
  */
 
-/**
- * Overridable so the contact route can be exercised end-to-end against a local
- * stub without sending real mail. Leave unset everywhere but local testing.
- */
-const ENDPOINT =
-  process.env.EMAILJS_ENDPOINT || "https://api.emailjs.com/api/v1.0/email/send";
+import emailjs from "@emailjs/browser";
 
 export type ContactPayload = {
   name: string;
@@ -22,10 +16,8 @@ export type ContactPayload = {
 };
 
 export class EmailConfigError extends Error {}
-export class EmailSendError extends Error {}
 
-function requiredEnv(key: string): string {
-  const value = process.env[key];
+function requiredEnv(key: string, value: string | undefined): string {
   if (!value) {
     throw new EmailConfigError(`Missing environment variable: ${key}`);
   }
@@ -33,31 +25,31 @@ function requiredEnv(key: string): string {
 }
 
 export async function sendContactEmail(payload: ContactPayload): Promise<void> {
-  const body = {
-    service_id: requiredEnv("EMAILJS_SERVICE_ID"),
-    template_id: requiredEnv("EMAILJS_TEMPLATE_ID"),
-    user_id: requiredEnv("EMAILJS_PUBLIC_KEY"),
-    accessToken: requiredEnv("EMAILJS_PRIVATE_KEY"),
-    template_params: {
+  // Next.js only inlines NEXT_PUBLIC_ vars for the browser when accessed as a
+  // static `process.env.X` — a dynamic `process.env[key]` lookup is never
+  // replaced and is always undefined client-side. Each access must stay literal.
+  const serviceId = requiredEnv(
+    "NEXT_PUBLIC_EMAILJS_SERVICE_ID",
+    process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
+  );
+  const templateId = requiredEnv(
+    "NEXT_PUBLIC_EMAILJS_TEMPLATE_ID",
+    process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID,
+  );
+  const publicKey = requiredEnv(
+    "NEXT_PUBLIC_EMAILJS_PUBLIC_KEY",
+    process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY,
+  );
+
+  await emailjs.send(
+    serviceId,
+    templateId,
+    {
       from_name: payload.name,
       from_email: payload.email,
       reply_to: payload.email,
       message: payload.message,
     },
-  };
-
-  const response = await fetch(ENDPOINT, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-    // Never let a hung provider hold a serverless invocation open.
-    signal: AbortSignal.timeout(10_000),
-  });
-
-  if (!response.ok) {
-    const detail = await response.text().catch(() => "");
-    throw new EmailSendError(
-      `EmailJS responded ${response.status}: ${detail.slice(0, 300)}`,
-    );
-  }
+    { publicKey },
+  );
 }

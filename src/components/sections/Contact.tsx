@@ -10,15 +10,11 @@ import {
   IconPin,
 } from "@/components/ui/art";
 import { Reveal } from "@/components/ui/Reveal";
+import { sendContactEmail } from "@/lib/emailjs";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
 const empty = { name: "", email: "", message: "", company: "" };
-
-function humanDelay(seconds: number): string {
-  if (seconds < 90) return `${seconds} seconds`;
-  return `${Math.ceil(seconds / 60)} minutes`;
-}
 
 export function Contact() {
   const [form, setForm] = useState(empty);
@@ -32,40 +28,25 @@ export function Contact() {
     event.preventDefault();
     if (status === "sending") return;
 
+    // Silently accept and discard bot submissions — telling them would only help.
+    if (form.company.trim() !== "") {
+      setStatus("sent");
+      setFeedback("Thank you — your message is on its way. I will reply soon.");
+      setForm(empty);
+      return;
+    }
+
     setStatus("sending");
     setFeedback("");
 
     try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      const data = await response.json().catch(() => ({}));
-
-      if (response.status === 429) {
-        setStatus("error");
-        setFeedback(
-          `You have reached the limit of 3 messages. Please try again in about ${humanDelay(
-            Number(data.retryAfter) || 600,
-          )}.`,
-        );
-        return;
-      }
-
-      if (!response.ok) {
-        setStatus("error");
-        setFeedback(data.error ?? "Something went wrong. Please try again.");
-        return;
-      }
-
+      await sendContactEmail(form);
       setStatus("sent");
       setFeedback("Thank you — your message is on its way. I will reply soon.");
       setForm(empty);
     } catch {
       setStatus("error");
-      setFeedback("Network error. Please check your connection and try again.");
+      setFeedback("Could not send your message right now. Please try again.");
     }
   }
 
@@ -251,11 +232,6 @@ export function Contact() {
               }`}
             >
               {feedback}
-            </p>
-
-            <p className="mt-1 text-xs leading-relaxed text-muted">
-              To keep the inbox clean, this form accepts up to 3 messages per
-              10 minutes from the same network.
             </p>
           </form>
         </Reveal>
