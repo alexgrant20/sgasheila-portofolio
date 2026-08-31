@@ -3,6 +3,7 @@ const { createServer } = require('http')
 const { parse } = require('url')
 const next = require('next')
 
+process.env.UV_THREADPOOL_SIZE = '2'
 const dev = process.env.NODE_ENV !== 'production'
 const hostname = 'localhost'
 const port = process.env.port || 8080
