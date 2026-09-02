@@ -25,7 +25,7 @@ export function Nav() {
           href="#top"
           className="font-display text-2xl italic tracking-tight text-ink"
         >
-          {profile.firstName}
+          {profile.name}
         </a>
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
