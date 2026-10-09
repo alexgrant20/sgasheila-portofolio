@@ -11,6 +11,11 @@ import {
 } from "@/components/ui/art";
 import { Reveal } from "@/components/ui/Reveal";
 import { Hcaptcha, type HcaptchaHandle } from "@/components/ui/Hcaptcha";
+import {
+  LIMITS,
+  validateContact,
+  type ContactErrors,
+} from "@/lib/contact-validation";
 import { sendContactEmail } from "@/lib/web3forms";
 
 type Status = "idle" | "sending" | "sent" | "error";
@@ -21,10 +26,14 @@ export function Contact() {
   const [form, setForm] = useState(empty);
   const [status, setStatus] = useState<Status>("idle");
   const [feedback, setFeedback] = useState("");
+  const [errors, setErrors] = useState<ContactErrors>({});
   const captcha = useRef<HcaptchaHandle>(null);
 
-  const update = (field: keyof typeof empty) => (value: string) =>
+  const update = (field: keyof typeof empty) => (value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    // Clear a field's error as soon as the visitor edits it.
+    if (field !== "company") setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,6 +44,14 @@ export function Contact() {
       setStatus("sent");
       setFeedback("Thank you — your message is on its way. I will reply soon.");
       setForm(empty);
+      return;
+    }
+
+    const found = validateContact(form);
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      setStatus("error");
+      setFeedback("Please fix the highlighted fields.");
       return;
     }
 
@@ -50,9 +67,9 @@ export function Contact() {
 
     try {
       await sendContactEmail({
-        name: form.name,
-        email: form.email,
-        message: form.message,
+        name: form.name.trim(),
+        email: form.email.trim(),
+        message: form.message.trim(),
         captchaToken,
       });
       setStatus("sent");
@@ -160,16 +177,22 @@ export function Contact() {
                 <input
                   id="name"
                   name="name"
+                  aria-invalid={errors.name ? true : undefined}
+                  aria-describedby={errors.name ? "name-error" : undefined}
                   type="text"
                   required
-                  minLength={2}
-                  maxLength={80}
+                  maxLength={LIMITS.name.max}
                   autoComplete="name"
                   value={form.name}
                   onChange={(e) => update("name")(e.target.value)}
                   placeholder="Your name"
                   className={inputClass}
                 />
+                {errors.name && (
+                  <p id="name-error" className="mt-2 text-sm text-coral">
+                    {errors.name}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -182,15 +205,22 @@ export function Contact() {
                 <input
                   id="email"
                   name="email"
+                  aria-invalid={errors.email ? true : undefined}
+                  aria-describedby={errors.email ? "email-error" : undefined}
                   type="email"
                   required
-                  maxLength={120}
+                  maxLength={LIMITS.email.max}
                   autoComplete="email"
                   value={form.email}
                   onChange={(e) => update("email")(e.target.value)}
                   placeholder="you@company.com"
                   className={inputClass}
                 />
+                {errors.email && (
+                  <p id="email-error" className="mt-2 text-sm text-coral">
+                    {errors.email}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -203,17 +233,29 @@ export function Contact() {
                 <textarea
                   id="message"
                   name="message"
+                  aria-invalid={errors.message ? true : undefined}
+                  aria-describedby={errors.message ? "message-error" : undefined}
                   required
-                  minLength={10}
-                  maxLength={2000}
+                  maxLength={LIMITS.message.max}
                   rows={5}
                   value={form.message}
                   onChange={(e) => update("message")(e.target.value)}
                   placeholder="Tell me about the system or project."
                   className={`${inputClass} resize-y`}
                 />
-                <p className="mt-2 text-right text-xs text-muted">
-                  {form.message.length}/2000
+                {errors.message && (
+                  <p id="message-error" className="mt-2 text-sm text-coral">
+                    {errors.message}
+                  </p>
+                )}
+                <p
+                  className={`mt-2 text-right text-xs ${
+                    form.message.trim().length >= LIMITS.message.min
+                      ? "font-semibold text-yellow"
+                      : "text-muted"
+                  }`}
+                >
+                  {form.message.length}/{LIMITS.message.max}
                 </p>
               </div>
 

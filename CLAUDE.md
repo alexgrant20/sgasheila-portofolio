@@ -16,8 +16,8 @@ React 19, TypeScript, Tailwind CSS v4. Deployed on Vercel.
 
 Tests are plain `node:test` files run through Node native TypeScript type stripping — no Jest or
 Vitest. Type stripping requires the `.ts` extension in the import specifier, which is why
-`tsconfig.json` sets `allowImportingTsExtensions`. Do not remove it. There are currently no test
-files; the harness is kept in place for whenever one is added.
+`tsconfig.json` sets `allowImportingTsExtensions`. Do not remove it. Current tests cover the contact
+validation (`src/lib/contact-validation.test.ts`).
 
 Requires a `.env.local` copied from `.env.example` before the contact form works; the rest of the
 site renders without it.
