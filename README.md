@@ -2,13 +2,13 @@
 
 A single-page portfolio for a Senior System Analyst, built with Next.js 16 (App Router),
 TypeScript, and Tailwind CSS v4, exported as a static site. The contact form sends through
-Web3Forms directly from the browser, protected by Google reCAPTCHA v2.
+Web3Forms directly from the browser, protected by Web3Forms' hCaptcha.
 
 ## Getting started
 
 ```bash
 npm install
-cp .env.example .env.local   # then fill in the Web3Forms / reCAPTCHA values
+cp .env.example .env.local   # then fill in the Web3Forms access key
 npm run dev                  # http://localhost:3000
 ```
 
@@ -63,28 +63,22 @@ backdrop without hand-rolling any of it.
 
 1. the hidden `company` honeypot is checked client-side — a filled value is silently accepted
    and discarded, never sent;
-2. when `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` is set, the reCAPTCHA v2 checkbox
-   (`src/components/ui/Recaptcha.tsx`) must be ticked, and its token is sent as
-   `g-recaptcha-response`;
-3. Web3Forms verifies that token server-side with the secret key stored in its dashboard, then
-   emails the message.
+2. the hCaptcha widget (`src/components/ui/Hcaptcha.tsx`, rendered by Web3Forms' own client
+   script) must be solved, and its token is sent as `h-captcha-response`;
+3. Web3Forms verifies the token server-side, then emails the message.
 
 There is no server of our own (`output: "export"`), so the only server-enforced defense is
-Web3Forms' reCAPTCHA check — the access key and site key are public by design.
+Web3Forms' hCaptcha check — the access key is public by design.
 
-### Web3Forms + reCAPTCHA setup
+### Web3Forms + hCaptcha setup
 
 1. Create a form at <https://web3forms.com> with the recipient email and copy the **access key**.
-2. Create a reCAPTCHA **v2 "I'm not a robot"** key pair at
-   <https://www.google.com/recaptcha/admin>; add your production domain and `localhost`.
-3. In the Web3Forms dashboard, open the form's settings and paste the reCAPTCHA **secret key**
-   (reCAPTCHA support may require a paid Web3Forms plan — check their current pricing).
-4. Put the access key and the reCAPTCHA **site key** in `.env.local`
-   (`NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY`, `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`; see `.env.example`).
-   Leaving the site key empty hides the widget.
+2. In that form's settings in the Web3Forms dashboard, enable **hCaptcha**. The free plan uses
+   Web3Forms' shared hCaptcha key, so there is nothing else to create.
+3. Put the access key in `.env.local` as `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` (see `.env.example`).
 
-For CI/CD, add `WEB3FORMS_ACCESS_KEY` and `RECAPTCHA_SITE_KEY` as GitHub Actions secrets
-(used by `.github/workflows/deploy.yml`). On Vercel, add the two `NEXT_PUBLIC_*` variables under
+For CI/CD, add `WEB3FORMS_ACCESS_KEY` as a GitHub Actions secret (used by
+`.github/workflows/deploy.yml`). On Vercel, add `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` under
 Project Settings → Environment Variables.
 
 ## Layout notes
@@ -106,5 +100,5 @@ Project Settings → Environment Variables.
 ## Deploying
 
 Push to GitHub and import the repository at [vercel.com/new](https://vercel.com/new). Add the
-two `NEXT_PUBLIC_*` variables above, then deploy. The build is a static export (`out/`), so
+`NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` variable, then deploy. The build is a static export (`out/`), so
 it also works on any static host — Netlify, GitHub Pages, S3, etc.

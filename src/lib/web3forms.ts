@@ -3,17 +3,16 @@
  *
  * The site is a static export with no server, so the form posts straight to
  * Web3Forms. The access key is public by design (it only routes mail to the
- * owner's inbox); abuse defense comes from the reCAPTCHA token, which
- * Web3Forms verifies server-side against the secret key stored in its
- * dashboard — see README for setup.
+ * owner's inbox); abuse defense comes from the hCaptcha token, which
+ * Web3Forms verifies server-side with its own keys — see README for setup.
  */
 
 export type ContactPayload = {
   name: string;
   email: string;
   message: string;
-  /** Token from the reCAPTCHA widget; omitted when reCAPTCHA is not configured. */
-  captchaToken?: string;
+  /** Solved hCaptcha token (the `h-captcha-response` field). */
+  captchaToken: string;
 };
 
 export class ContactConfigError extends Error {}
@@ -39,7 +38,7 @@ export async function sendContactEmail(payload: ContactPayload): Promise<void> {
     email: payload.email,
     message: payload.message,
   };
-  if (payload.captchaToken) body["g-recaptcha-response"] = payload.captchaToken;
+  body["h-captcha-response"] = payload.captchaToken;
 
   const response = await fetch(ENDPOINT, {
     method: "POST",
