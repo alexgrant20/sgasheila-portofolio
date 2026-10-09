@@ -2,13 +2,13 @@
 
 A single-page portfolio for a Senior System Analyst, built with Next.js 16 (App Router),
 TypeScript, and Tailwind CSS v4, exported as a static site. The contact form sends through
-EmailJS's browser SDK directly from the client.
+Web3Forms directly from the browser, protected by Google reCAPTCHA v2.
 
 ## Getting started
 
 ```bash
 npm install
-cp .env.example .env.local   # then fill in the EmailJS values
+cp .env.example .env.local   # then fill in the Web3Forms / reCAPTCHA values
 npm run dev                  # http://localhost:3000
 ```
 
@@ -58,27 +58,34 @@ backdrop without hand-rolling any of it.
 
 ## Contact form
 
-`Contact.tsx` calls `sendContactEmail()` (`src/lib/emailjs.ts`), which wraps EmailJS's browser
-SDK, directly from the client:
+`Contact.tsx` calls `sendContactEmail()` (`src/lib/web3forms.ts`), which POSTs to
+`https://api.web3forms.com/submit`:
 
 1. the hidden `company` honeypot is checked client-side — a filled value is silently accepted
    and discarded, never sent;
-2. otherwise the message goes straight to EmailJS via `emailjs.send()`.
+2. when `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` is set, the reCAPTCHA v2 checkbox
+   (`src/components/ui/Recaptcha.tsx`) must be ticked, and its token is sent as
+   `g-recaptcha-response`;
+3. Web3Forms verifies that token server-side with the secret key stored in its dashboard, then
+   emails the message.
 
-There is no server, so there is no server-enforced rate limit and no private key — the site is a
-static export (`output: "export"` in `next.config.ts`) with nothing to hold either.
+There is no server of our own (`output: "export"`), so the only server-enforced defense is
+Web3Forms' reCAPTCHA check — the access key and site key are public by design.
 
-### EmailJS setup
+### Web3Forms + reCAPTCHA setup
 
-1. Create an Email Service and an Email Template at <https://dashboard.emailjs.com>. The template
-   must use the variables `{{from_name}}`, `{{from_email}}`, and `{{message}}`.
-2. Copy the three values into `.env.local` (see `.env.example` for exactly where each one lives).
-   They carry the `NEXT_PUBLIC_` prefix on purpose — they ship to the browser, and there is no
-   private key to keep secret.
-3. Optional but recommended: under **Account → Security**, restrict allowed origins to your
-   deployed domain(s) so the public key can't be replayed from elsewhere.
+1. Create a form at <https://web3forms.com> with the recipient email and copy the **access key**.
+2. Create a reCAPTCHA **v2 "I'm not a robot"** key pair at
+   <https://www.google.com/recaptcha/admin>; add your production domain and `localhost`.
+3. In the Web3Forms dashboard, open the form's settings and paste the reCAPTCHA **secret key**
+   (reCAPTCHA support may require a paid Web3Forms plan — check their current pricing).
+4. Put the access key and the reCAPTCHA **site key** in `.env.local`
+   (`NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY`, `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`; see `.env.example`).
+   Leaving the site key empty hides the widget.
 
-On Vercel, add the same three variables under Project Settings → Environment Variables.
+For CI/CD, add `WEB3FORMS_ACCESS_KEY` and `RECAPTCHA_SITE_KEY` as GitHub Actions secrets
+(used by `.github/workflows/deploy.yml`). On Vercel, add the two `NEXT_PUBLIC_*` variables under
+Project Settings → Environment Variables.
 
 ## Layout notes
 
@@ -99,5 +106,5 @@ On Vercel, add the same three variables under Project Settings → Environment V
 ## Deploying
 
 Push to GitHub and import the repository at [vercel.com/new](https://vercel.com/new). Add the
-three `NEXT_PUBLIC_EMAILJS_*` variables, then deploy. The build is a static export (`out/`), so
+two `NEXT_PUBLIC_*` variables above, then deploy. The build is a static export (`out/`), so
 it also works on any static host — Netlify, GitHub Pages, S3, etc.

@@ -35,11 +35,12 @@ projects carry a `during` field naming the role held at the time — the CV grou
 role, not by date, so there are no project date ranges to state.
 
 **Contact flow.** The site is a static export (`output: "export"` in `next.config.ts`, no
-server), so `Contact.tsx` calls `sendContactEmail()` (`src/lib/emailjs.ts`) directly, which wraps
-the EmailJS **browser SDK**. The honeypot check happens client-side in `Contact.tsx` before
-sending. There is no server-enforced rate limit or private key — both required a server this
-site no longer has. `EMAILJS_*` variables must carry the `NEXT_PUBLIC_` prefix to reach the
-browser.
+server), so `Contact.tsx` calls `sendContactEmail()` (`src/lib/web3forms.ts`) directly, which
+POSTs to the Web3Forms API. The honeypot check happens client-side in `Contact.tsx` before
+sending; reCAPTCHA v2 (`src/components/ui/Recaptcha.tsx`, widget hidden when
+`NEXT_PUBLIC_RECAPTCHA_SITE_KEY` is unset) supplies a token that Web3Forms verifies server-side
+with the secret key kept in its dashboard. No private key lives in this repo. `WEB3FORMS_*` /
+`RECAPTCHA_*` variables must carry the `NEXT_PUBLIC_` prefix to reach the browser.
 
 **Graceful image fallbacks.** `Portrait.tsx` and `project-images.ts` use server-side `existsSync`
 / `readdirSync` so the page never renders a broken image: the portrait falls back to a silhouette

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { profile } from "@/content/site";
 import {
   IconArrow,
@@ -10,7 +10,8 @@ import {
   IconPin,
 } from "@/components/ui/art";
 import { Reveal } from "@/components/ui/Reveal";
-import { sendContactEmail } from "@/lib/emailjs";
+import { Recaptcha, type RecaptchaHandle } from "@/components/ui/Recaptcha";
+import { sendContactEmail } from "@/lib/web3forms";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -20,6 +21,9 @@ export function Contact() {
   const [form, setForm] = useState(empty);
   const [status, setStatus] = useState<Status>("idle");
   const [feedback, setFeedback] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const captcha = useRef<RecaptchaHandle>(null);
+  const captchaEnabled = Boolean(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY);
 
   const update = (field: keyof typeof empty) => (value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -36,17 +40,31 @@ export function Contact() {
       return;
     }
 
+    if (captchaEnabled && !captchaToken) {
+      setStatus("error");
+      setFeedback("Please tick “I’m not a robot” before sending.");
+      return;
+    }
+
     setStatus("sending");
     setFeedback("");
 
     try {
-      await sendContactEmail(form);
+      await sendContactEmail({
+        name: form.name,
+        email: form.email,
+        message: form.message,
+        captchaToken,
+      });
       setStatus("sent");
       setFeedback("Thank you — your message is on its way. I will reply soon.");
       setForm(empty);
     } catch {
       setStatus("error");
       setFeedback("Could not send your message right now. Please try again.");
+    } finally {
+      // A reCAPTCHA token is single-use, success or not.
+      captcha.current?.reset();
     }
   }
 
@@ -213,6 +231,8 @@ export function Contact() {
                   onChange={(e) => update("company")(e.target.value)}
                 />
               </div>
+
+              <Recaptcha ref={captcha} onToken={setCaptchaToken} />
             </div>
 
             <button
