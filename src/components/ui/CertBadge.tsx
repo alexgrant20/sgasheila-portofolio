@@ -57,11 +57,14 @@ export function CertBadge({
       <g fill={topic.ring}>
         {Array.from({ length: 12 }, (_, i) => {
           const angle = (i / 12) * Math.PI * 2;
+          // Trig results differ in the last digits between Node and the browser;
+          // rounding keeps server and client markup identical (no hydration mismatch).
+          const round = (n: number) => Math.round(n * 100) / 100;
           return (
             <circle
               key={i}
-              cx={60 + Math.cos(angle) * 48}
-              cy={60 + Math.sin(angle) * 48}
+              cx={round(60 + Math.cos(angle) * 48)}
+              cy={round(60 + Math.sin(angle) * 48)}
               r="9"
             />
           );
