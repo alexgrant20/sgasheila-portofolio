@@ -9,94 +9,139 @@ import type { SVGProps } from "react";
 export function BrushStroke({ className = "" }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 520 560"
+      width="650"
+      height="650"
+      viewBox="0 0 650 650"
       fill="none"
-      aria-hidden="true"
-      className={className}
+      xmlns="http://www.w3.org/2000/svg"
     >
-      <g transform="rotate(-6 260 300)">
-        {/*
-          Separate marks at different weights and angles, with cream showing
-          between them. Overlapping wide passes only merge back into a single
-          rounded mass, which stops reading as paint.
-        */}
-        <g stroke="var(--color-teal)" strokeLinecap="round" fill="none">
-          {/* The loaded sweep, drawn in three passes along one spine so the
-              mark narrows toward the top the way a brush does on landing
-              instead of ending in a slab. */}
-          <path d="M290 200C272 300 288 360 264 440C246 506 270 548 258 604" strokeWidth="198" />
-          <path d="M300 104C280 210 300 300 270 400C256 462 274 500 264 548" strokeWidth="142" />
-          <path d="M306 52C294 118 306 168 288 232C278 268 292 296 284 330" strokeWidth="76" />
-          <path d="M404 156C424 262 390 342 408 442C420 510 400 554 408 604" strokeWidth="58" opacity="0.85" />
-          <path d="M152 216C132 302 158 372 138 462" strokeWidth="32" opacity="0.7" />
-          <path d="M108 336C98 384 110 414 102 456" strokeWidth="13" opacity="0.5" />
-          <path d="M446 268C458 320 444 356 456 402" strokeWidth="11" opacity="0.42" />
-        </g>
+      {/* <!-- Main circular halo --> */}
+      <circle cx="325" cy="325" r="285" fill="#EEF6F3" />
 
-        {/*
-          Tapered flicks: filled wedges, because a lifting brush thins to a
-          point in a way a constant-width stroke never does.
-        */}
-        <g fill="var(--color-teal)">
-          <path d="M206 128C186 82 170 48 146 12C176 50 200 92 222 132Z" opacity="0.8" />
-          <path d="M340 90C350 60 358 38 370 12C364 46 358 80 356 108Z" opacity="0.65" />
-          <path d="M368 462C400 476 428 494 454 518C424 502 396 490 364 480Z" opacity="0.4" />
-          <path d="M176 476C148 490 124 508 100 532C126 512 152 498 182 490Z" opacity="0.35" />
-        </g>
+      {/* <!-- Main organic teal shape --> */}
+      <path
+        d="
+      M430 90
+      C500 95 548 150 535 215
+      C527 255 555 285 568 325
+      C585 375 566 435 525 465
+      C495 487 479 525 447 548
+      C397 585 330 578 295 540
+      C263 505 260 465 218 435
+      C170 401 143 348 158 292
+      C172 240 219 222 253 185
+      C290 145 334 81 430 90
+      Z
+    "
+        fill="#238579"
+      />
 
-        {/*
-          The dry brush. Painting the negative space in the page colour is
-          what turns a loaded stroke into bristle marks — it assumes the hero
-          sits on the cream panel.
-        */}
-        <g stroke="var(--color-cream)" strokeLinecap="round" fill="none">
-          <path d="M240 60C212 190 244 306 216 434C200 514 226 552 216 600" strokeWidth="7" />
-          <path d="M336 96C356 200 316 300 340 404C356 480 332 534 342 596" strokeWidth="4" />
-          <path d="M282 150C262 250 292 336 272 436" strokeWidth="3" />
-          <path d="M198 258C186 340 204 400 190 480" strokeWidth="5" />
-          <path d="M354 254C368 330 348 388 360 466" strokeWidth="2.5" />
-          <path d="M254 402C240 462 260 508 246 566" strokeWidth="3" />
-          <path d="M310 466C318 508 306 540 314 590" strokeWidth="2.5" />
-          <path d="M406 208C416 286 398 346 410 418" strokeWidth="3" />
-        </g>
+      {/* <!-- Secondary organic shape --> */}
+      <path
+        d="
+      M180 337
+      C167 285 195 244 238 235
+      C276 226 296 192 327 165
+      C354 141 394 136 417 160
+      C441 185 429 221 412 247
+      C390 280 399 315 423 341
+      C454 375 474 417 460 454
+      C445 495 398 515 357 503
+      C319 492 299 460 266 445
+      C224 426 191 392 180 337
+      Z
+    "
+        fill="#66ABA1"
+        opacity="0.75"
+      />
 
-        {/*
-          Bites out of the silhouette and dabs just outside it. A smooth
-          outline is the tell that a shape was drawn rather than painted, so
-          the edge gets broken in both directions.
-        */}
-        <g stroke="var(--color-cream)" strokeLinecap="round" fill="none">
-          <path d="M184 318C178 344 184 362 180 388" strokeWidth="15" />
-          <path d="M374 258C380 282 374 300 378 324" strokeWidth="12" />
-          <path d="M190 462C186 482 192 498 188 514" strokeWidth="10" />
-          <path d="M356 432C362 454 354 472 360 494" strokeWidth="9" />
-          <path d="M272 104C266 122 272 136 268 152" strokeWidth="11" />
-        </g>
-        <g fill="var(--color-teal)">
-          <ellipse cx="174" cy="366" rx="8" ry="17" opacity="0.6" />
-          <ellipse cx="386" cy="288" rx="6" ry="14" opacity="0.5" />
-          <ellipse cx="182" cy="530" rx="7" ry="12" opacity="0.45" />
-          <ellipse cx="316" cy="74" rx="5" ry="11" opacity="0.4" />
-        </g>
+      {/* <!-- Soft left blob --> */}
+      <path
+        d="
+      M115 370
+      C118 315 145 278 182 270
+      C205 265 222 282 225 306
+      C229 336 210 354 197 379
+      C180 412 163 441 140 433
+      C119 425 113 402 115 370
+      Z
+    "
+        fill="#9BC8C1"
+        opacity="0.8"
+      />
 
-        {/* Where the paint pooled and dragged */}
-        <g stroke="var(--color-teal-deep)" strokeLinecap="round" opacity="0.13" fill="none">
-          <path d="M228 140C204 250 246 340 222 448" strokeWidth="7" />
-          <path d="M330 180C352 270 312 344 336 448" strokeWidth="5" />
-          <path d="M272 420C256 476 282 516 266 566" strokeWidth="4" />
-        </g>
+      {/* <!-- Soft lower-right blob --> */}
+      <path
+        d="
+      M416 405
+      C438 375 470 368 496 384
+      C521 399 529 430 518 455
+      C507 481 477 493 451 483
+      C421 471 397 433 416 405
+      Z
+    "
+        fill="#B7D8D3"
+      />
 
-        {/* Spatter thrown off the bristles */}
-        <g fill="var(--color-teal)">
-          <circle cx="86" cy="272" r="7" opacity="0.45" />
-          <circle cx="62" cy="318" r="4" opacity="0.34" />
-          <circle cx="112" cy="184" r="3.5" opacity="0.28" />
-          <circle cx="462" cy="344" r="6" opacity="0.4" />
-          <circle cx="486" cy="296" r="3.5" opacity="0.3" />
-          <circle cx="440" cy="120" r="4.5" opacity="0.26" />
-          <circle cx="330" cy="34" r="4" opacity="0.32" />
-        </g>
-      </g>
+      {/* <!-- White organic accent --> */}
+      <path
+        d="M438 164
+       C452 214 455 264 460 315
+       C464 366 478 412 496 444"
+        stroke="#FFFDF8"
+        stroke-width="5"
+        stroke-linecap="round"
+      />
+
+      {/* <!-- Left white accent --> */}
+      <path
+        d="M209 293
+       C220 331 220 362 208 395"
+        stroke="#FFFDF8"
+        stroke-width="5"
+        stroke-linecap="round"
+      />
+
+      {/* <!-- Top curved line --> */}
+      <path
+        d="
+      M160 154
+      C225 92 300 61 378 65
+    "
+        stroke="#4A9B91"
+        stroke-width="3"
+        stroke-linecap="round"
+      />
+
+      {/* <!-- Outer decorative arc --> */}
+      <path
+        d="
+      M105 448
+      C65 345 77 240 140 160
+    "
+        stroke="#78B6AE"
+        stroke-width="4"
+        stroke-linecap="round"
+        opacity="0.75"
+      />
+
+      {/* <!-- Dots --> */}
+      <circle cx="112" cy="282" r="7" fill="#72AEA7" />
+      <circle cx="145" cy="225" r="4" fill="#A5CCC6" />
+      <circle cx="177" cy="167" r="6" fill="#8DBFB8" />
+
+      <circle cx="535" cy="260" r="5" fill="#9AC6C0" />
+      <circle cx="560" cy="315" r="3" fill="#B5D5D0" />
+      <circle cx="525" cy="500" r="7" fill="#65AAA1" />
+
+      <circle cx="155" cy="475" r="5" fill="#A4CCC6" />
+      <circle cx="232" cy="530" r="4" fill="#84B9B1" />
+
+      {/* <!-- Small floating circle --> */}
+      <circle cx="505" cy="130" r="22" fill="#D3E5E1" />
+
+      {/* <!-- Small teal circle --> */}
+      <circle cx="125" cy="405" r="13" fill="#4D9B92" />
     </svg>
   );
 }

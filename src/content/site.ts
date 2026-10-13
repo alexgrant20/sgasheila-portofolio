@@ -68,16 +68,15 @@ export const stats: {
   decimals?: number;
   label: string;
 }[] = [
-  { value: 10, label: "Projects delivered" },
-  { value: 6, label: "Team members led" },
-  { value: 4, label: "Roles, one company" },
+  { value: 12, label: "Projects delivered" },
+  { value: 15,  suffix: "+", label: "Team members led" },
   { value: 3.82, decimals: 2, label: "GPA out of 4.00" },
 ];
 
 export const experience = [
   {
     role: "Project Officer",
-    org: "IT Division, Bina Nusantara Group",
+    org: "PT. Bina Inovasi Global (BINOVARA)",
     period: "Oct 2024 — Present",
     current: true,
     bullets: [
@@ -143,46 +142,31 @@ export type Project = {
 };
 
 export const projects: Project[] = [
-  {
-    slug: "siaga",
-    name: "SIAGA",
-    full: "Sistem Informasi Kelembagaan",
-    client: "Kemdiktisaintek",
-    during: "Junior Project Staff",
-    description:
-      "Higher-education institutional registration — universities, study programs, and related services.",
-    role: "Requirement analysis, Laravel development, database management, and system testing.",
-    tags: ["Requirement Analysis", "Development", "Database", "Testing"],
-  },
-  {
+    {
+    slug: "binus-maya",
+    name: "BINUS Maya",
+    client: "BINUS",
+    during: "Associate Member",
+    description: "Internal academic system serving students, staff, and lecturers.",
+    role: "Full-stack development in PHP — front-end, back-end, and database integration.",
+    tags: ["Requirement Analysis","Development", "Database", "Testing"],
+    },
+    {
     slug: "igcn",
     name: "IGCN",
     full: "Indonesia Global Compact Network",
     client: "UN Global Compact Indonesia",
     during: "Junior Project Staff",
-    description:
-      "Platform supporting UN Global Compact initiatives across Indonesia.",
+    description: "Platform supporting UN Global Compact initiatives across Indonesia.",
     role: "Requirement analysis, Laravel development, database management, and system testing.",
     tags: ["Requirement Analysis", "Development", "Database", "Testing"],
   },
-  {
-    slug: "pisn",
-    name: "PISN",
-    full: "Penomoran Ijazah dan Sertifikat Nasional",
-    client: "Kemdiktisaintek",
-    during: "Junior Project Staff, continued as Project Officer",
-    description:
-      "National service that assigns unique certificate and diploma numbers.",
-    role: "Requirement analysis, database management, and testing.",
-    tags: ["Requirement Analysis", "Database", "Testing"],
-  },
-  {
-    slug: "piln",
-    name: "PILN",
-    full: "Penyetaraan Ijazah Luar Negeri",
-    client: "Kemdiktisaintek",
+    {
+    slug: "binus-partner",
+    name: "BINUS Partner",
+    client: "BINUS",
     during: "Junior Project Staff",
-    description: "Foreign degree equivalency assessment and issuance.",
+    description: "Internal application for managing partnership contacts.",
     role: "Requirement analysis, database management, and system testing.",
     tags: ["Requirement Analysis", "Database", "Testing"],
   },
@@ -197,31 +181,50 @@ export const projects: Project[] = [
     tags: ["Requirement Analysis", "Database", "Testing"],
   },
   {
-    slug: "binus-partner",
-    name: "BINUS Partner",
-    client: "BINUS",
-    during: "Junior Project Staff",
-    description: "Internal application for managing partnership contacts.",
+    slug: "siaga",
+    name: "SIAGA",
+    full: "Sistem Informasi Kelembagaan",
+    client: "Kemdiktisaintek",
+    during: "Project Staff",
+    description: "Higher-education institutional registration — universities, study programs, and related services.",
+    role: "Requirement analysis, Laravel development, database management, and system testing.",
+    tags: ["Requirement Analysis", "Development", "Database", "Testing"],
+  },
+  {
+    slug: "piln",
+    name: "PILN",
+    full: "Penyetaraan Ijazah Luar Negeri",
+    client: "Kemdiktisaintek",
+    during: "Project Staff",
+    description: "Foreign degree equivalency assessment and issuance.",
     role: "Requirement analysis, database management, and system testing.",
     tags: ["Requirement Analysis", "Database", "Testing"],
   },
   {
-    slug: "binus-maya",
-    name: "BINUS Maya",
-    client: "BINUS",
-    during: "Associate Member",
-    description:
-      "Internal academic system serving students, staff, and lecturers.",
-    role: "Full-stack development in PHP — front-end, back-end, and database integration.",
-    tags: ["Development", "Database"],
+    slug: "pisn",
+    name: "PISN",
+    full: "Penomoran Ijazah dan Sertifikat Nasional",
+    client: "Kemdiktisaintek",
+    during: "Project Staff, continued as Project Officer",
+    description: "National service that assigns unique certificate and diploma numbers.",
+    role: "Requirement analysis, database management, and testing.",
+    tags: ["Requirement Analysis", "Database", "Testing"],
+  },
+  {
+    slug: "santoleo-payroll",
+    name: "Santo Leo Payroll",
+    client: "Santo Leo School",
+    during: "Project Staff, continued as Project Officer",
+    description: "Internal application for managing employee payroll, salary calculations, and payment records.",
+    role: "Requirement analysis, database management, and testing.",
+    tags: ["Requirement Analysis", "Database", "Testing"],
   },
   {
     slug: "developer-workspace",
     name: "Developer Workspace",
-    client: "Bina Inovasi Global",
+    client: "PT. Bina Inovasi Global (BINOVARA)",
     during: "Project Officer",
-    description:
-      "Internal employee management application: attendance, leave, and project tracking.",
+    description: "Internal employee management application: attendance, leave, and project tracking.",
     role: "System testing.",
     tags: ["Testing"],
   },
@@ -242,6 +245,15 @@ export const projects: Project[] = [
     description: "Internal application for monitoring student violations.",
     role: "System testing.",
     tags: ["Testing"],
+  },
+    {
+    slug: "new-tfi",
+    name: "New TFI",
+    client: "BINUS",
+    during: "Project Officer",
+    description: "Internal application for managing and monitoring student community service activities.",
+    role: "Requirement analysis and system testing.",
+    tags: ["Requirement Analysis", "Testing"],
   },
 ];
 

@@ -8,7 +8,7 @@ export function Experience() {
       id="experience"
       eyebrow="Career"
       title="My work experience"
-      intro={`${yearsOfExperience()} years and ${experience.length} roles inside the IT Division of Bina Nusantara Group — moving from writing code to owning the analysis and the delivery.`}
+      intro={`${yearsOfExperience()}+ years in IT, progressing from programming and system analysis to project planning, team coordination, and software delivery.`}
     >
       <ol className="relative border-l border-line pl-8 sm:pl-12">
         {experience.map((job, i) => (
@@ -30,7 +30,9 @@ export function Experience() {
                   <h3 className="font-display text-2xl font-semibold text-ink">
                     {job.role}
                   </h3>
-                  <p className="mt-1 text-sm font-medium text-teal">{job.org}</p>
+                  <p className="mt-1 text-sm font-medium text-teal">
+                    {job.org}
+                  </p>
                 </div>
                 <p className="shrink-0 text-sm font-semibold uppercase tracking-[0.12em] text-muted">
                   {job.period}

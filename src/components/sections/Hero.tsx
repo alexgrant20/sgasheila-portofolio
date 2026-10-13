@@ -8,23 +8,21 @@ import { Portrait } from "@/components/ui/Portrait";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
- * Three zones across the band, as in the reference layout:
- *   left   — headline, then email, then the years-of-experience mark
- *   centre — the figure standing on a teal brush stroke, cropped by the
- *            section's bottom edge
- *   right  — the one-line pitch up top, the credential stamp down below
+ * Hero section layout:
+ * - Left: Headline, email, CV download, and years of experience.
+ * - Centre: Portrait layered over a teal brush stroke.
+ * - Right: Introductory text and credential stamp.
  */
 export function Hero() {
   const years = yearsOfExperience();
 
   return (
-    // overflow-hidden crops the figure at the section's bottom edge, and keeps
-    // the brush stroke from widening the page on phones.
+    // Crop the artwork at the section boundaries and prevent horizontal overflow.
     <section id="top" className="relative overflow-hidden">
       <div className="mx-auto w-full max-w-6xl px-6 sm:px-10 lg:px-16">
         <div className="grid gap-y-10 pt-8 lg:min-h-[34rem] lg:grid-cols-12 lg:gap-x-6 lg:pt-12">
-          {/* Left */}
-          <div className="flex flex-col lg:col-span-5 lg:pb-14">
+          {/* Left column: Introduction and experience */}
+          <div className="flex flex-col lg:col-span-4 lg:pb-14">
             <Reveal>
               <h1 className="font-hero text-[clamp(2.25rem,5.2vw,3.5rem)] font-bold leading-[1.08] tracking-[-0.02em] text-navy">
                 Hey There,
@@ -57,7 +55,7 @@ export function Hero() {
             <Reveal delay={0.2}>
               <div className="mt-10 flex items-center gap-4 lg:mt-auto lg:pt-14">
                 <span className="font-hero text-[2.75rem] font-bold leading-none text-navy">
-                  {years}
+                  {years}+
                 </span>
                 <span className="text-[0.7rem] font-semibold uppercase leading-[1.5] tracking-[0.18em] text-muted">
                   Years
@@ -68,22 +66,28 @@ export function Hero() {
             </Reveal>
           </div>
 
-          {/* Centre — figure on the brush stroke */}
-          <div className="relative min-h-[22rem] sm:min-h-[28rem] lg:col-span-4 lg:min-h-0">
-            {/* The art is allowed to spill past its column, as in the
-                reference, so the figure reads at full scale. */}
-            <div className="absolute -inset-x-[14%] bottom-0 top-0">
-              {/* Full height, so the stroke stands behind the figure from the
-                  top of the frame all the way down to the crop. */}
-              <BrushStroke className="absolute inset-0 h-full w-full" />
-              <div className="absolute inset-x-0 bottom-0 top-[12%]">
+          {/* Centre column: Portrait layered over the brush stroke.
+              On mobile and tablet, clip the top and bottom while keeping the
+              artwork's left and right edges visible. On desktop, allow the
+              artwork to extend beyond the column as before. */}
+          <div className="relative -mt-20 min-h-[24rem] [clip-path:inset(0_-100vw)] sm:-mt-24 sm:min-h-[32rem] lg:col-span-4 lg:mt-0 lg:min-h-0 lg:[clip-path:none]">
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 top-0 z-0 lg:-inset-x-[10%]">
+              {/* Adjust the horizontal translation to align the brush stroke
+                  with the portrait. Update the -translate-x values if needed. */}
+              <div className="absolute inset-0 origin-bottom -translate-x-[5%] scale-[0.8] sm:-translate-x-[9%] sm:scale-90 lg:-translate-x-[35%] lg:scale-110">
+                <BrushStroke className="h-full w-full" />
+              </div>
+
+              {/* Position the portrait above the brush stroke. */}
+              <div className="absolute inset-x-0 bottom-0 top-[12%] lg:-inset-x-[12%] lg:-top-[8%]">
                 <Portrait alt={`Portrait of ${profile.name}`} />
               </div>
             </div>
           </div>
 
-          {/* Right */}
-          <div className="flex flex-col gap-10 lg:col-span-3 lg:gap-14 lg:pb-14">
+          {/* Right column: Introduction and credentials.
+              Keep the content above the artwork using z-10. */}
+          <div className="relative z-10 flex flex-col gap-10 pt-2 lg:col-span-4 lg:items-end lg:gap-14 lg:pb-14 lg:pt-0">
             <Reveal delay={0.08}>
               <p className="max-w-[15rem] text-sm leading-[1.75] text-muted">
                 {profile.intro}
